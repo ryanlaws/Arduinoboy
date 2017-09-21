@@ -109,12 +109,12 @@ void checkStopNote(byte m)
 void stopNote(byte m)
 {
   for(int x=0;x<midioutNoteHoldCounter[m];x++) {
-    midiData[0] = (0x80 + (memory[MEM_MIDIOUT_NOTE_CH+m]));
+    midiData[0] = (0x80 + (getChannel(m)));
     midiData[1] = midioutNoteHold[m][x];
     midiData[2] = 0x00;
     serial->write(midiData,3);
 #ifdef MIDI_INTERFACE
-    usbMIDI.sendNoteOff(midioutNoteHold[m][x], 0, memory[MEM_MIDIOUT_NOTE_CH+m]+1);
+    usbMIDI.sendNoteOff(midioutNoteHold[m][x], 0, getChannel(m)+1);
 #endif
   }
   midiOutLastNote[m] = -1;
@@ -123,12 +123,12 @@ void stopNote(byte m)
 
 void playNote(byte m, byte n)
 {
-  midiData[0] = (0x90 + (memory[MEM_MIDIOUT_NOTE_CH+m]));
+  midiData[0] = (0x90 + (getChannel(m)));
   midiData[1] = n;
   midiData[2] = 0x7F;
   serial->write(midiData,3);
 #ifdef MIDI_INTERFACE
-  usbMIDI.sendNoteOn(n, 127, memory[MEM_MIDIOUT_NOTE_CH+m]+1);
+  usbMIDI.sendNoteOn(n, 127, getChannel(m)+1);
 #endif
 
   midioutNoteHold[m][midioutNoteHoldCounter[m]] =n;
@@ -152,7 +152,7 @@ void playCC(byte m, byte n)
     midiData[2] = v;
     serial->write(midiData,3);
 #ifdef MIDI_INTERFACE
-    usbMIDI.sendControlChange((memory[MEM_MIDIOUT_CC_NUMBERS+n]), v, memory[MEM_MIDIOUT_NOTE_CH+m]+1);
+    usbMIDI.sendControlChange((memory[MEM_MIDIOUT_CC_NUMBERS+n]), v, getChannel(m)+1);
 #endif
   } else {
     if(memory[MEM_MIDIOUT_CC_SCALING+m]) {
@@ -166,18 +166,18 @@ void playCC(byte m, byte n)
     midiData[2] = v;
     serial->write(midiData,3);
 #ifdef MIDI_INTERFACE
-    usbMIDI.sendControlChange((memory[MEM_MIDIOUT_CC_NUMBERS+n]), v, memory[MEM_MIDIOUT_NOTE_CH+m]+1);
+    usbMIDI.sendControlChange((memory[MEM_MIDIOUT_CC_NUMBERS+n]), v, getChannel(m)+1);
 #endif
   }
 }
 
 void playPC(byte m, byte n)
 {
-  midiData[0] = (0xC0 + (memory[MEM_MIDIOUT_NOTE_CH+m]));
+  midiData[0] = (0xC0 + (getChannel(m)));
   midiData[1] = n;
   serial->write(midiData,2);
 #ifdef MIDI_INTERFACE
-  usbMIDI.sendProgramChange(n, memory[MEM_MIDIOUT_NOTE_CH+m]+1);
+  usbMIDI.sendProgramChange(n, getChannel(m)+1);
 #endif
 }
 
@@ -187,12 +187,12 @@ void stopAllNotes()
     if(midiOutLastNote[m]>=0) {
       stopNote(m);
     }
-    midiData[0] = (0xB0 + (memory[MEM_MIDIOUT_NOTE_CH+m]));
+    midiData[0] = (0xB0 + (getChannel(m)));
     midiData[1] = 123;
     midiData[2] = 0x7F;
     serial->write(midiData,3); //Send midi
 #ifdef MIDI_INTERFACE
-    usbMIDI.sendControlChange(123, 127, memory[MEM_MIDIOUT_NOTE_CH+m]+1);
+    usbMIDI.sendControlChange(123, 127, getChannel(m)+1);
 #endif
   }
 }
@@ -215,4 +215,9 @@ boolean getIncommingSlaveByte()
     return true;
   }
   return false;
+}
+
+byte getChannel(byte m)
+{
+	return memory[MEM_MIDIOUT_NOTE_CH+m];
 }
