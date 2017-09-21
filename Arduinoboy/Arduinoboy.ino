@@ -257,6 +257,8 @@ byte midioutNoteHold[4][4];
 byte midioutNoteHoldCounter[4];
 int midioutNoteTimerThreshold = 10;
 
+byte volcaSampleChannel = 0;
+
 /***************************************************************************
 * Counter vars
 ***************************************************************************/

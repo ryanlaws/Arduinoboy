@@ -123,6 +123,7 @@ void stopNote(byte m)
 
 void playNote(byte m, byte n)
 {
+  setVolcaSampleChannel(n);
   midiData[0] = (0x90 + (getChannel(m)));
   midiData[1] = n;
   midiData[2] = 0x7F;
@@ -219,5 +220,10 @@ boolean getIncommingSlaveByte()
 
 byte getChannel(byte m)
 {
-  memory[MEM_MIDIOUT_NOTE_CH+m];
+  return byte < 0x3 ? memory[MEM_MIDIOUT_NOTE_CH+m] : volcaSampleChannel;
+}
+
+void setVolcaSampleChannel(byte n)
+{
+  volcaSampleChannel = n % 10;
 }
