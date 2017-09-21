@@ -219,5 +219,5 @@ boolean getIncommingSlaveByte()
 
 byte getChannel(byte m)
 {
-	return memory[MEM_MIDIOUT_NOTE_CH+m];
+  memory[MEM_MIDIOUT_NOTE_CH+m];
 }
