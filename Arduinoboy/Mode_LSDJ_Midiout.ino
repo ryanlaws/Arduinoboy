@@ -145,16 +145,8 @@ void playCC(byte m, byte n)
   if(memory[MEM_MIDIOUT_CC_MODE+m]) {
     if(memory[MEM_MIDIOUT_CC_SCALING+m]) {
       v = (v & 0x0F)*8;
-      //if(v) v --;
     }
     n=(m*7)+((n>>4) & 0x07);
-    midiData[0] = (0xB0 + (memory[MEM_MIDIOUT_CC_CH+m]));
-    midiData[1] = (memory[MEM_MIDIOUT_CC_NUMBERS+n]);
-    midiData[2] = v;
-    serial->write(midiData,3);
-#ifdef MIDI_INTERFACE
-    usbMIDI.sendControlChange((memory[MEM_MIDIOUT_CC_NUMBERS+n]), v, getChannel(m)+1);
-#endif
   } else {
     if(memory[MEM_MIDIOUT_CC_SCALING+m]) {
       float s;
@@ -162,14 +154,14 @@ void playCC(byte m, byte n)
       v = ((s / 0x6f) * 0x7f);
     }
     n=(m*7);
-    midiData[0] = (0xB0 + (memory[MEM_MIDIOUT_CC_CH+m]));
-    midiData[1] = (memory[MEM_MIDIOUT_CC_NUMBERS+n]);
-    midiData[2] = v;
-    serial->write(midiData,3);
-#ifdef MIDI_INTERFACE
-    usbMIDI.sendControlChange((memory[MEM_MIDIOUT_CC_NUMBERS+n]), v, getChannel(m)+1);
-#endif
   }
+  midiData[0] = (0xB0 + (memory[MEM_MIDIOUT_CC_CH+m]));
+  midiData[1] = (memory[MEM_MIDIOUT_CC_NUMBERS+n]);
+  midiData[2] = v;
+  serial->write(midiData,3);
+#ifdef MIDI_INTERFACE
+  usbMIDI.sendControlChange((memory[MEM_MIDIOUT_CC_NUMBERS+n]), v, getChannel(m)+1);
+#endif
 }
 
 void playPC(byte m, byte n)
@@ -220,7 +212,7 @@ boolean getIncommingSlaveByte()
 
 byte getChannel(byte m)
 {
-  return byte < 0x3 ? memory[MEM_MIDIOUT_NOTE_CH+m] : volcaSampleChannel;
+  return m < 0x3 ? memory[MEM_MIDIOUT_NOTE_CH+m] : volcaSampleChannel;
 }
 
 void setVolcaSampleChannel(byte n)
