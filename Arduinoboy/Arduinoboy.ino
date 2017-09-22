@@ -254,6 +254,7 @@ uint16_t blinkMaxCount = 1000;
 
 unsigned long midioutNoteTimer[4];
 byte midioutNoteHold[4][4];
+byte volcaSampleChannelHold[4];
 byte midioutNoteHoldCounter[4];
 int midioutNoteTimerThreshold = 10;
 

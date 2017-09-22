@@ -108,13 +108,15 @@ void checkStopNote(byte m)
 
 void stopNote(byte m)
 {
+  byte stopChannel;
   for(int x=0;x<midioutNoteHoldCounter[m];x++) {
-    midiData[0] = (0x80 + (getChannel(m)));
+    stopChannel = m < 0x3 ? getChannel(m) : volcaSampleChannelHold[x];
+    midiData[0] = 0x80 + stopChannel;
     midiData[1] = midioutNoteHold[m][x];
     midiData[2] = 0x00;
     serial->write(midiData,3);
 #ifdef MIDI_INTERFACE
-    usbMIDI.sendNoteOff(midioutNoteHold[m][x], 0, getChannel(m)+1);
+    usbMIDI.sendNoteOff(midioutNoteHold[m][x], 0, stopChannel+1);
 #endif
   }
   midiOutLastNote[m] = -1;
@@ -135,6 +137,9 @@ void playNote(byte m, byte n)
 #endif
 
   midioutNoteHold[m][midioutNoteHoldCounter[m]] =n;
+  if (m == 3) {
+    volcaSampleChannelHold[midioutNoteHoldCounter[m]] = volcaSampleChannel;
+  }
   midioutNoteHoldCounter[m]++;
   midioutNoteTimer[m] = millis();
   midiOutLastNote[m] =n;
