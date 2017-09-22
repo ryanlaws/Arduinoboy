@@ -118,7 +118,7 @@ void stopNote(byte m)
     midiData[2] = 0x00;
     serial->write(midiData,3);
 #ifdef MIDI_INTERFACE
-    usbMIDI.sendNoteOff(midioutNoteHold[m][x], 0, stopChannel+1);
+    usbMIDI.sendNoteOff(midioutNoteHold[m][x], 0, getChannel(m)+1);
 #endif
   }
   midiOutLastNote[m] = -1;
