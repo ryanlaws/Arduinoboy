@@ -108,6 +108,10 @@ void checkStopNote(byte m)
 
 void stopNote(byte m)
 {
+  // Volca sample doesn't need note offs
+  if (m == 3) {
+    return;  
+  }
   for(int x=0;x<midioutNoteHoldCounter[m];x++) {
     midiData[0] = (0x80 + (getChannel(m)));
     midiData[1] = midioutNoteHold[m][x];
@@ -124,7 +128,7 @@ void stopNote(byte m)
 void playNote(byte m, byte n)
 {
   if (m == 3) {
-    setVolcaSampleChannel(n);
+    volcaSampleChannel = n % 10;
   }
   midiData[0] = (0x90 + (getChannel(m)));
   midiData[1] = n;
@@ -134,6 +138,10 @@ void playNote(byte m, byte n)
   usbMIDI.sendNoteOn(n, 127, getChannel(m)+1);
 #endif
 
+  // Volca sample doesn't need note offs
+  if (m == 3) {
+    return;
+  }
   midioutNoteHold[m][midioutNoteHoldCounter[m]] =n;
   midioutNoteHoldCounter[m]++;
   midioutNoteTimer[m] = millis();
@@ -157,7 +165,7 @@ void playCC(byte m, byte n)
     }
     n=(m*7);
   }
-  midiData[0] = (0xB0 + (memory[MEM_MIDIOUT_CC_CH+m]));
+  midiData[0] = (0xB0 + getChannel(m));
   midiData[1] = (memory[MEM_MIDIOUT_CC_NUMBERS+n]);
   midiData[2] = v;
   serial->write(midiData,3);
@@ -178,7 +186,7 @@ void playPC(byte m, byte n)
 
 void stopAllNotes()
 {
-  for(int m=0;m<4;m++) {
+  for(int m=0;m<3;m++) {
     if(midiOutLastNote[m]>=0) {
       stopNote(m);
     }
@@ -214,10 +222,7 @@ boolean getIncommingSlaveByte()
 
 byte getChannel(byte m)
 {
-  return m < 0x3 ? memory[MEM_MIDIOUT_NOTE_CH+m] : volcaSampleChannel;
+  // Volca sample is always 1-10 - hard-code others to 11-13
+  return m < 0x3 ? m+10 : volcaSampleChannel;
 }
 
-void setVolcaSampleChannel(byte n)
-{
-  volcaSampleChannel = n % 10;
-}
