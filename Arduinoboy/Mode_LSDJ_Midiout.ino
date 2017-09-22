@@ -123,7 +123,9 @@ void stopNote(byte m)
 
 void playNote(byte m, byte n)
 {
-  setVolcaSampleChannel(n);
+  if (m == 3) {
+    setVolcaSampleChannel(n);
+  }
   midiData[0] = (0x90 + (getChannel(m)));
   midiData[1] = n;
   midiData[2] = 0x7F;
